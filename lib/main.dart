@@ -16,8 +16,11 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'package:travellerinromania/gpsperiodic.dart';
 import 'package:travellerinromania/splashscreen.dart';
+import 'package:travellerinromania/poipage.dart';
 import 'package:travellerinromania/firstpage.dart';
-
+import 'package:travellerinromania/loginpage.dart';
+import 'package:travellerinromania/registerpage.dart';
+import 'package:travellerinromania/scanqrcode.dart';
 import 'package:travellerinromania/errorpage.dart';
 
 void main() {
@@ -131,15 +134,21 @@ class _MyHomePageState extends State<MyHomePage> {
           return splashScreen(this.doRefresh);
         case 1:
           return FirstPage(this.doRefresh);
-
+        case 5:
+          return RegisterPage(this.doRefresh);
+        case 6:
+          return poiPage(this.doRefresh);
+        //Text("Requesting Page " + globals.poiId);
         // case 11:
         //   return BrowsePage(this.doRefresh);
-        // case 12:
-        //   return ScanQRPage(this.doRefresh);
+        case 12:
+          return ScanQRPage(this.doRefresh);
         // case 13:
         //   return ShowMapPage(this.doRefresh);
-        // case 14:
-        //   return LoginPage(this.doRefresh);
+        case 14:
+          if (globals.userId == "") return LoginPage(this.doRefresh);
+//           return LoginPage(this.doRefresh);
+
         // case 15:
         //   return AddPhotoPage(this.doRefresh);
         // case 16:

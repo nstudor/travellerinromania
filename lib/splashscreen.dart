@@ -22,13 +22,5 @@ class _splashScreen extends State<splashScreen> {
       ),
       Text("Loading...")
     ]));
-
-    // child: FittedBox(
-    //   child:
-    // ),
-    //   FittedBox(
-    //     child:
-    //
-    // ]),
   }
 }

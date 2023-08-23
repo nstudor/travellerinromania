@@ -19,8 +19,7 @@ String userId = "";
 String userName = "";
 String userMail = "";
 
-String questId = "";
-String questName = "";
+String poiId = "";
 
 int gpsTime = DateTime.now().millisecondsSinceEpoch;
 
@@ -48,11 +47,15 @@ List<Marker> userMarker = [
 
 dynamic postData(String endpoint, dynamic postdata) async {
   final response = await http.post(
-      Uri.parse("https://monumente.eot.ro/app/" + endpoint + ".api"),
+      Uri.parse("https://monumente.eot.ro/" + endpoint + ".api"),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: postdata);
-  print(response.body);
-  return json.decode(response.body);
+  String data = '{"error":"Bad response from API"}';
+  if (response.statusCode == 200) {
+    data = response.body;
+  }
+  print("GOT API for " + endpoint);
+  return json.decode(data);
 }

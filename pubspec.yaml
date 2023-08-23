@@ -24,6 +24,7 @@ dependencies:
   flutter_map_location_marker: ^5.2.1
   flutter_qr_bar_scanner: ^3.0.2
   map_launcher: ^2.2.2
+  flutter_html: ^2.0.0-nullsafety.0
 
 dev_dependencies:
   flutter_test:
