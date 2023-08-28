@@ -20,6 +20,8 @@ import 'package:travellerinromania/poipage.dart';
 import 'package:travellerinromania/firstpage.dart';
 import 'package:travellerinromania/loginpage.dart';
 import 'package:travellerinromania/registerpage.dart';
+import 'package:travellerinromania/profilepage.dart';
+import 'package:travellerinromania/showmappage.dart';
 import 'package:travellerinromania/scanqrcode.dart';
 import 'package:travellerinromania/errorpage.dart';
 
@@ -65,12 +67,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-
-  // final skmap = SKMap();
-  // final skpois = SKPois();
-  // final skcamera = SKCamera();
   late StreamSubscription<Position> positionStream;
-  Timer? periodicTimer;
   SharedPreferences? prefs;
 
   @override
@@ -97,28 +94,6 @@ class _MyHomePageState extends State<MyHomePage> {
     globals.userName = prefs!.getString('user_name') ?? "";
     globals.userMail = prefs!.getString('user_mail') ?? "";
 
-    periodicTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      print('timer');
-/*      
-      if (_selectedIndex == 14) {
-        globals.userMarker = [
-          Marker(
-            width: 30,
-            height: 30,
-            point: LatLng(globals.gpsLatitude, globals.gpsLongitude),
-            builder: (ctx) => Icon(
-              shadows: <Shadow>[Shadow(color: Colors.white, blurRadius: 15.0)],
-              Icons.accessibility,
-              size: 30,
-              color: Colors.purpleAccent,
-            ),
-          )
-        ];
-      }
-      globals.screensize = MediaQuery.of(context).size.width;
-*/
-    });
-
     setState(() {
       print('settingState 1');
       _selectedIndex = 1;
@@ -134,6 +109,8 @@ class _MyHomePageState extends State<MyHomePage> {
           return splashScreen(this.doRefresh);
         case 1:
           return FirstPage(this.doRefresh);
+        case 4:
+          return LoginPage(this.doRefresh);
         case 5:
           return RegisterPage(this.doRefresh);
         case 6:
@@ -143,11 +120,10 @@ class _MyHomePageState extends State<MyHomePage> {
         //   return BrowsePage(this.doRefresh);
         case 12:
           return ScanQRPage(this.doRefresh);
-        // case 13:
-        //   return ShowMapPage(this.doRefresh);
+        case 13:
+          return ShowMapPage(this.doRefresh);
         case 14:
-          if (globals.userId == "") return LoginPage(this.doRefresh);
-//           return LoginPage(this.doRefresh);
+          return ProfilePage(this.doRefresh);
 
         // case 15:
         //   return AddPhotoPage(this.doRefresh);

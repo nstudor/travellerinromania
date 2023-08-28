@@ -33,8 +33,11 @@ class _LoginPage extends State<LoginPage> {
           ),
           const SizedBox(height: 10),
           Text(
-            "Introduceti email si parola",
+            globals.textInfo == ""
+                ? "Introduceti email si parola"
+                : globals.textInfo,
             style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 60),
           TextFormField(
@@ -52,9 +55,6 @@ class _LoginPage extends State<LoginPage> {
             ),
             onEditingComplete: () => _focusNodePassword.requestFocus(),
             validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return "Introduceti adresa de e-mail.";
-              }
               return null;
             },
           ),
@@ -84,9 +84,6 @@ class _LoginPage extends State<LoginPage> {
               ),
             ),
             validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return "Introduceti parola.";
-              }
               return null;
             },
           ),
@@ -100,8 +97,41 @@ class _LoginPage extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                onPressed: () {
-                  print("Trying to login");
+                onPressed: () async {
+                  globals.textInfo = "";
+
+                  String ce = cUser.text;
+                  String cp = cPass.text;
+
+                  if ((ce.indexOf('@') < 1) || (ce.indexOf('.') < 1)) {
+                    globals.showMessage(context, "Adresa de e-mail invalida !",
+                        Colors.redAccent);
+                    return;
+                  }
+
+                  if (cp.length < 6) {
+                    globals.showMessage(
+                        context, "Parola invalida !", Colors.redAccent);
+                    return;
+                  }
+
+                  dynamic log = await globals.postData("login",
+                      jsonEncode(<String, String?>{'email': ce, 'pass': cp}));
+
+                  LogData data = LogData.fromMap(log);
+                  String status = data.status!;
+                  if (status == "error") {
+                    String errtxt = data.error!;
+                    globals.showMessage(context, errtxt, Colors.redAccent);
+                    return;
+                  }
+                  globals.userId = data.userid!;
+                  globals.userName = data.username!;
+                  globals.userMail = data.usermail!;
+                  print("ID:" + globals.userId);
+                  print("NM:" + globals.userName);
+                  print("EM:" + globals.userMail);
+                  this.widget.callback(14);
                 },
                 child: const Text("CONECTARE"),
               ),
@@ -111,6 +141,7 @@ class _LoginPage extends State<LoginPage> {
                   const Text("Nu aveti cont?"),
                   TextButton(
                     onPressed: () {
+                      globals.textInfo = "";
                       this.widget.callback(5);
                     },
                     child: const Text("Inregistrati-va"),
@@ -122,5 +153,29 @@ class _LoginPage extends State<LoginPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    cUser.dispose();
+    cPass.dispose();
+    super.dispose();
+  }
+}
+
+class LogData {
+  final String? status;
+  final String? error;
+  final String? userid;
+  final String? usermail;
+  final String? username;
+  LogData({this.status, this.error, this.userid, this.usermail, this.username});
+  factory LogData.fromMap(Map<String, dynamic> map) {
+    return LogData(
+        status: map['status'],
+        error: map['error'],
+        userid: map['userid'],
+        usermail: map['usermail'],
+        username: map['username']);
   }
 }

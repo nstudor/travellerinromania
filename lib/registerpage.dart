@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:core';
 import 'package:flutter/material.dart';
 import 'globals.dart' as globals;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,14 +13,10 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPage extends State<RegisterPage> {
-  final FocusNode _focusNodeEmail = FocusNode();
-  final FocusNode _focusNodePassword = FocusNode();
-  final FocusNode _focusNodeConfirmPassword = FocusNode();
-  final TextEditingController _controllerUsername = TextEditingController();
-  final TextEditingController _controllerEmail = TextEditingController();
-  final TextEditingController _controllerPassword = TextEditingController();
-  final TextEditingController _controllerConFirmPassword =
-      TextEditingController();
+  final TextEditingController cUsername = TextEditingController();
+  final TextEditingController cEmail = TextEditingController();
+  final TextEditingController cPassword = TextEditingController();
+  final TextEditingController cConFirmPassword = TextEditingController();
   bool _obscurePassword = true;
 
   SharedPreferences? prefs;
@@ -44,7 +41,7 @@ class _RegisterPage extends State<RegisterPage> {
           ),
           const SizedBox(height: 35),
           TextFormField(
-            controller: _controllerUsername,
+            controller: cUsername,
             keyboardType: TextInputType.name,
             decoration: InputDecoration(
               labelText: "Nume",
@@ -57,17 +54,12 @@ class _RegisterPage extends State<RegisterPage> {
               ),
             ),
             validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return "Introduceti numele.";
-              }
               return null;
             },
-            onEditingComplete: () => _focusNodeEmail.requestFocus(),
           ),
           const SizedBox(height: 10),
           TextFormField(
-            controller: _controllerEmail,
-            focusNode: _focusNodeEmail,
+            controller: cEmail,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               labelText: "Email",
@@ -80,20 +72,13 @@ class _RegisterPage extends State<RegisterPage> {
               ),
             ),
             validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return "Introduceti email.";
-              } else if (!(value.contains('@') && value.contains('.'))) {
-                return "Email invalid ";
-              }
               return null;
             },
-            onEditingComplete: () => _focusNodePassword.requestFocus(),
           ),
           const SizedBox(height: 10),
           TextFormField(
-            controller: _controllerPassword,
+            controller: cPassword,
             obscureText: _obscurePassword,
-            focusNode: _focusNodePassword,
             keyboardType: TextInputType.visiblePassword,
             decoration: InputDecoration(
               labelText: "Parola",
@@ -115,20 +100,13 @@ class _RegisterPage extends State<RegisterPage> {
               ),
             ),
             validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return "Introduceti parola.";
-              } else if (value.length < 8) {
-                return "Parola trebuie sa aiba lungime minima 8.";
-              }
               return null;
             },
-            onEditingComplete: () => _focusNodeConfirmPassword.requestFocus(),
           ),
           const SizedBox(height: 10),
           TextFormField(
-            controller: _controllerConFirmPassword,
+            controller: cConFirmPassword,
             obscureText: _obscurePassword,
-            focusNode: _focusNodeConfirmPassword,
             keyboardType: TextInputType.visiblePassword,
             decoration: InputDecoration(
               labelText: "Confirma parola",
@@ -150,11 +128,6 @@ class _RegisterPage extends State<RegisterPage> {
               ),
             ),
             validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return "Introduceti parola.";
-              } else if (value != _controllerPassword.text) {
-                return "Parolele nu coincid.";
-              }
               return null;
             },
           ),
@@ -168,26 +141,59 @@ class _RegisterPage extends State<RegisterPage> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                onPressed: () {
-                  // if (_formKey.currentState?.validate() ?? false) {
+                onPressed: () async {
+                  String cu = cUsername.text;
+                  String ce = cEmail.text;
+                  String cp = cPassword.text;
+                  String cc = cConFirmPassword.text;
 
-                  //   ScaffoldMessenger.of(context).showSnackBar(
-                  //     SnackBar(
-                  //       width: 200,
-                  //       backgroundColor:
-                  //           Theme.of(context).colorScheme.secondary,
-                  //       shape: RoundedRectangleBorder(
-                  //         borderRadius: BorderRadius.circular(10),
-                  //       ),
-                  //       behavior: SnackBarBehavior.floating,
-                  //       content: const Text("Registered Successfully"),
-                  //     ),
-                  //   );
+                  //validari
+                  if (cp != cc) {
+                    globals.showMessage(
+                        context, "Parolele nu coincid !", Colors.redAccent);
+                    return;
+                    //Theme.of(context).colorScheme.secondary
+                  }
 
-                  //   // _formKey.currentState?.reset();
+                  if (cu.trim() == "") {
+                    globals.showMessage(
+                        context, "Introduceti numele !", Colors.redAccent);
+                    return;
+                  }
 
-                  //   Navigator.pop(context);
-                  // }
+                  if ((ce.indexOf('@') < 1) || (ce.indexOf('.') < 1)) {
+                    globals.showMessage(context, "Adresa de e-mail invalida !",
+                        Colors.redAccent);
+                    return;
+                  }
+
+                  if (cp.length < 6) {
+                    globals.showMessage(
+                        context,
+                        "Parola trebuie sa contina minim 6 caractere !",
+                        Colors.redAccent);
+                    return;
+                  }
+
+                  dynamic reg = await globals.postData(
+                      "register",
+                      jsonEncode(<String, String?>{
+                        'name': cu,
+                        'email': ce,
+                        'pass': cp
+                      }));
+
+                  RegData data = RegData.fromMap(reg);
+                  String status = data.status!;
+                  if (status == "error") {
+                    String errtxt = data.error!;
+                    globals.showMessage(context, errtxt, Colors.redAccent);
+                    return;
+                  }
+                  globals.textInfo = "Ati primit pe adresa de e-mail \n" +
+                      ce +
+                      "\n un link de activare. \nDupa activarea contului, va puteti conecta!";
+                  this.widget.callback(14);
                 },
                 child: const Text("Register"),
               ),
@@ -205,6 +211,27 @@ class _RegisterPage extends State<RegisterPage> {
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  void dispose() {
+    cUsername.dispose();
+    cEmail.dispose();
+    cPassword.dispose();
+    cConFirmPassword.dispose();
+    super.dispose();
+  }
+}
+
+class RegData {
+  final String? status;
+  final String? error;
+  RegData({this.status, this.error});
+  factory RegData.fromMap(Map<String, dynamic> map) {
+    return RegData(
+      status: map['status'],
+      error: map['error'],
     );
   }
 }

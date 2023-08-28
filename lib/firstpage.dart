@@ -37,7 +37,10 @@ class _FirstPage extends State<FirstPage> {
         getCard(Icons.view_list_rounded, 'Browse', 11),
         getCard(Icons.qr_code_2_outlined, 'Scan code', 12),
         getCard(Icons.map_outlined, 'Show map', 13),
-        getCard(Icons.person_outlined, 'Login', 14),
+        getCard(
+            Icons.person_outlined,
+            globals.userId == "" ? "Login" : "Profile",
+            globals.userId == "" ? 4 : 14),
         getCard(Icons.add_a_photo_outlined, 'Add photo', 15),
         getCard(Icons.search_outlined, 'Search', 16),
       ],

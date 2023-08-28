@@ -21,6 +21,8 @@ String userMail = "";
 
 String poiId = "";
 
+String textInfo = "";
+
 int gpsTime = DateTime.now().millisecondsSinceEpoch;
 
 bool gpsChanged = false;
@@ -56,6 +58,25 @@ dynamic postData(String endpoint, dynamic postdata) async {
   if (response.statusCode == 200) {
     data = response.body;
   }
-  print("GOT API for " + endpoint);
+  String postStr = json.encode(postdata);
+  print("GOT API for " + endpoint + " : " + postStr + "\n" + data);
   return json.decode(data);
+}
+
+void showMessage(context, String x, Color cl) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      width: MediaQuery.of(context).size.width - 20,
+      backgroundColor: cl,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      behavior: SnackBarBehavior.floating,
+      content: Text(
+        x,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+    ),
+  );
 }
