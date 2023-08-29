@@ -25,7 +25,7 @@ class _ScanQRPage extends State<ScanQRPage> {
         int nr = code!.indexOf('/?p=');
         globals.poiId = code!.substring(nr + 4);
         _qrInfo = code!.substring(nr + 4);
-        this.widget.callback(6);
+        widget.callback(6);
       } else {
         _qrInfo = code!;
         dynamic upload = await globals.postData(
